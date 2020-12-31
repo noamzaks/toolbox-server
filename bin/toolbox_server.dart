@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'utilities.dart';
 
@@ -6,10 +7,20 @@ void main(List<String> arguments) async {
   print('Running at ${server.address.address} on port ${server.port}');
 
   await for (final request in server) {
-    final body = await request.body;
-    request.response.headers.contentType =
-        ContentType('application', 'json', charset: 'utf-8');
-    request.response.write({'message': 'Hello ${body['user']}!'});
-    await request.response.close();
+    try {
+      final socket = await WebSocketTransformer.upgrade(request);
+      socket.add(json.encode({'message': 'Hello World!'}));
+      socket.listen((data) => handler(socket, data));
+    } on WebSocketException {
+      request.response.headers.contentType = ContentType.json;
+      request.response
+          .write({'error': 'Failed to upgrade connection to WebSocket'});
+      await request.response.close();
+    }
   }
+}
+
+void handler(WebSocket socket, dynamic data) {
+  print(data);
+  socket.add(json.encode({'message': 'received'}));
 }
