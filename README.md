@@ -1,4 +1,3 @@
-A simple command-line application.
+# Toolbox Server
 
-Created from templates made available by Stagehand under a BSD-style
-[license](https://github.com/dart-lang/stagehand/blob/master/LICENSE).
+The server for Toolbox written in Dart with WebSockets.
